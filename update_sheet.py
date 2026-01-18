@@ -161,13 +161,7 @@ time.sleep(20)
 # ===============================
 
 driver.get(
-    "https://ip3.rilapp.com/railways/patrollingReport.php"
-    "?fdate=17/01/2026"
-    "&ftime=04:00"
-    "&tdate=18/01/2026"
-    "&ttime=16:00"
-    "&category=-PM"
-    "&Submit=Update"
+    "https://ip3.rilapp.com/railways/patrollingReport.php?fdate=17%2F01%2F2026&ftime=04%3A00&tdate=18%2F01%2F2026&ttime=16%3A00&category=-PM&Submit=Update"
 )
 
 time.sleep(20)
