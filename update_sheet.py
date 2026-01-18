@@ -112,11 +112,41 @@ try:
     # ===============================
     # TABLE READ
     # ===============================
-    rows = wait.until(
-        EC.presence_of_all_elements_located(
-            (By.XPATH, "//table//tbody//tr")
-        )
-    )
+    # ===============================
+# TABLE READ (IFRAME + PAGE SOURCE SAFE)
+# ===============================
+
+time.sleep(20)  # AJAX load के लिए extra time
+
+# iframe के अंदर table हो सकती है
+iframes = driver.find_elements(By.TAG_NAME, "iframe")
+if iframes:
+    driver.switch_to.frame(iframes[0])
+    time.sleep(5)
+
+# अब सीधे page source से rows पढ़ेंगे
+rows = driver.find_elements(By.XPATH, "//table//tr")
+
+data = []
+
+for r in rows:
+    cols = r.find_elements(By.TAG_NAME, "td")
+    if len(cols) >= 6:
+        device_id = cols[0].text.strip()
+        end_time = cols[3].text.strip()
+        km_run = cols[4].text.strip()
+        last_location = cols[5].text.strip()
+
+        if device_id and end_time:
+            data.append([
+                device_id,
+                end_time,
+                km_run,
+                last_location
+            ])
+
+if not data:
+    raise RuntimeError("Table not found or no data loaded (iframe/AJAX issue)")
 
     data = []
     for r in rows:
