@@ -2,7 +2,7 @@ name: Auto Update Patrolling Sheet
 
 on:
   schedule:
-    - cron: "0 * * * *"   # हर 1 घंटे
+    - cron: "*/15 * * * *"   # हर 15 मिनट
   workflow_dispatch:
 
 jobs:
