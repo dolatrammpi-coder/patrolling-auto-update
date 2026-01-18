@@ -62,28 +62,44 @@ try:
     driver.get("https://ip3.rilapp.com")
     time.sleep(5)
 
-    username_box = wait.until(
-        EC.presence_of_element_located(
-            (By.XPATH, "//input[@type='text' or @name='username' or @id='username']")
-        )
-    )
-    username_box.clear()
-    username_box.send_keys(LOGIN_USERNAME)
+    # ===============================
+# LOGIN (ROBUST VERSION)
+# ===============================
+driver.get("https://ip3.rilapp.com")
+time.sleep(10)
 
-    password_box = wait.until(
-        EC.presence_of_element_located(
-            (By.XPATH, "//input[@type='password']")
-        )
-    )
-    password_box.clear()
-    password_box.send_keys(LOGIN_PASSWORD)
+# अगर page iframe में हो तो switch
+iframes = driver.find_elements(By.TAG_NAME, "iframe")
+if iframes:
+    driver.switch_to.frame(iframes[0])
 
-    login_button = wait.until(
-        EC.element_to_be_clickable(
-            (By.XPATH, "//button[@type='submit' or contains(text(),'Login')]")
-        )
+# Username (generic catch)
+username_box = wait.until(
+    EC.presence_of_element_located(
+        (By.XPATH, "//input[not(@type='password')]")
     )
-    login_button.click()
+)
+username_box.clear()
+username_box.send_keys(LOGIN_USERNAME)
+
+# Password
+password_box = wait.until(
+    EC.presence_of_element_located(
+        (By.XPATH, "//input[@type='password']")
+    )
+)
+password_box.clear()
+password_box.send_keys(LOGIN_PASSWORD)
+
+# Login button (any clickable submit)
+login_button = wait.until(
+    EC.element_to_be_clickable(
+        (By.XPATH, "//button | //input[@type='submit']")
+    )
+)
+login_button.click()
+
+time.sleep(12)
 
     time.sleep(10)
 
