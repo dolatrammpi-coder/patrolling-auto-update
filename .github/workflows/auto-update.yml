@@ -2,29 +2,31 @@ name: Auto Update Patrolling Sheet
 
 on:
   schedule:
-    - cron: "0 * * * *"   # हर 1 घंटे
-  workflow_dispatch:
+    - cron: "*/15 * * * *"   # हर 15 मिनट
+  workflow_dispatch:        # Manual run (Run workflow button)
 
 jobs:
   run-script:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: |
+          pip install selenium gspread google-auth
 
-      - name: Run automation
+      - name: Run Patrolling Script
         env:
           LOGIN_USERNAME: ${{ secrets.LOGIN_USERNAME }}
           LOGIN_PASSWORD: ${{ secrets.LOGIN_PASSWORD }}
           GOOGLE_JSON: ${{ secrets.GOOGLE_JSON }}
           SHEET_NAME: ${{ secrets.SHEET_NAME }}
-        run: python update_sheet.py
+        run: |
+          python patrolling_to_sheet.py
