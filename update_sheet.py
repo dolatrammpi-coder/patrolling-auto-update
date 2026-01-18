@@ -57,15 +57,83 @@ wait = WebDriverWait(driver, 20)
 
 try:
     # ===============================
-    # LOGIN
+    # LOGIN (ROBUST)
     # ===============================
     driver.get("https://ip3.rilapp.com")
-    time.sleep(5)
+    time.sleep(10)
+
+    # iframe handle (अगर हो)
+    iframes = driver.find_elements(By.TAG_NAME, "iframe")
+    if iframes:
+        driver.switch_to.frame(iframes[0])
+
+    # Username
+    username_box = wait.until(
+        EC.presence_of_element_located(
+            (By.XPATH, "//input[not(@type='password')]")
+        )
+    )
+    username_box.clear()
+    username_box.send_keys(LOGIN_USERNAME)
+
+    # Password
+    password_box = wait.until(
+        EC.presence_of_element_located(
+            (By.XPATH, "//input[@type='password']")
+        )
+    )
+    password_box.clear()
+    password_box.send_keys(LOGIN_PASSWORD)
+
+    # Login button
+    login_button = wait.until(
+        EC.element_to_be_clickable(
+            (By.XPATH, "//button | //input[@type='submit']")
+        )
+    )
+    login_button.click()
+
+    time.sleep(12)
 
     # ===============================
-# LOGIN (ROBUST VERSION)
-# ===============================
-driver.get("https://ip3.rilapp.com")
+    # REPORT PAGE
+    # ===============================
+    driver.get("https://ip3.rilapp.com/patrolling-report")
+    time.sleep(12)
+
+    # ===============================
+    # TABLE READ
+    # ===============================
+    rows = wait.until(
+        EC.presence_of_all_elements_located(
+            (By.XPATH, "//table//tbody//tr")
+        )
+    )
+
+    data = []
+    for r in rows:
+        cols = r.find_elements(By.TAG_NAME, "td")
+        if len(cols) >= 6:
+            data.append([
+                cols[0].text.strip(),   # Device ID
+                cols[3].text.strip(),   # End Time
+                cols[4].text.strip(),   # KM Run
+                cols[5].text.strip()    # Last Location
+            ])
+
+    if not data:
+        raise ValueError("No data found in report table")
+
+    df = pd.DataFrame(
+        data,
+        columns=["Device ID", "End Time", "KM Run", "Last Location"]
+    )
+
+    sheet.clear()
+    sheet.update([df.columns.values.tolist()] + df.values.tolist())
+
+finally:
+    driver.quit()
 time.sleep(10)
 
 # अगर page iframe में हो तो switch
