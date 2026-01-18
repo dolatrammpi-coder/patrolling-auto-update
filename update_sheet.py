@@ -1,6 +1,7 @@
 import os
 import time
 import json
+from datetime import datetime
 
 import gspread
 from google.oauth2.service_account import Credentials
@@ -56,7 +57,7 @@ chrome_options.add_argument("--headless=new")
 chrome_options.add_argument("--no-sandbox")
 chrome_options.add_argument("--disable-dev-shm-usage")
 
-service = Service()   # Selenium Manager handles driver
+service = Service()
 driver = webdriver.Chrome(service=service, options=chrome_options)
 wait = WebDriverWait(driver, 30)
 
@@ -85,24 +86,24 @@ try:
     )
     login_btn.click()
 
-    # Login complete
     time.sleep(8)
 
 
     # ===============================
-    # REPORT PAGE (CHANGE DATES IF NEEDED)
+    # REPORT PAGE
     # ===============================
     REPORT_URL = (
         "https://ip3.rilapp.com/railways/patrollingReport.php"
         "?fdate=17/01/2026&ftime=23:00"
-        "&tdate=18/01/2026&ttime=7:10"
+        "&tdate=18/01/2026&ttime=07:10"
         "&category=-PM&Submit=Update"
     )
 
     driver.get(REPORT_URL)
 
+
     # ===============================
-    # WAIT FOR TABLE
+    # READ TABLE
     # ===============================
     rows = wait.until(
         EC.presence_of_all_elements_located(
@@ -111,6 +112,7 @@ try:
     )
 
     data = []
+
     for r in rows:
         cols = r.find_elements(By.TAG_NAME, "td")
         if len(cols) >= 7:
@@ -119,10 +121,14 @@ try:
             km_run = cols[6].text.strip()
             last_location = cols[5].text.strip()
 
-            if device:
+            if device and end_time:
+                # Convert End Time to datetime for sorting
+                end_dt = datetime.strptime(end_time, "%d/%m/%Y %H:%M:%S")
+
                 data.append([
                     device,
-                    end_time,
+                    end_time,   # display
+                    end_dt,     # sorting key
                     km_run,
                     last_location
                 ])
@@ -132,15 +138,30 @@ try:
 
 
     # ===============================
+    # SORT BY END TIME (ASCENDING)
+    # ===============================
+    data.sort(key=lambda x: x[2])
+
+
+    # ===============================
+    # PREPARE FINAL ROWS (REMOVE SORT KEY)
+    # ===============================
+    final_rows = [
+        [row[0], row[1], row[3], row[4]]
+        for row in data
+    ]
+
+
+    # ===============================
     # GOOGLE SHEET UPDATE
     # ===============================
     sheet.clear()
     sheet.update(
         "A1",
-        [["Device", "End Time", "KM Run", "Last Location"]] + data
+        [["Device", "End Time", "KM Run", "Last Location"]] + final_rows
     )
 
-    print(f"SUCCESS: {len(data)} rows updated in Google Sheet")
+    print(f"SUCCESS: {len(final_rows)} rows updated in ascending End Time order")
 
 finally:
     driver.quit()
