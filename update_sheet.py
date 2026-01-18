@@ -173,39 +173,44 @@ time.sleep(25)
 
 
 # ===============================
-# TABLE READ (NO wait.until)
 # ===============================
-rows = driver.find_elements(By.XPATH, "//table//tr")
+# TABLE READ (DATATABLES #example)
+# ===============================
+
+# DataTables पूरी तरह initialize होने का wait
+rows = wait.until(
+    EC.presence_of_all_elements_located(
+        (By.CSS_SELECTOR, "#example tbody tr")
+    )
+)
 
 data = []
 
 for r in rows:
     cols = r.find_elements(By.TAG_NAME, "td")
-    if len(cols) >= 6:
-        device_id = cols[0].text.strip()
-        end_time = cols[3].text.strip()
-        km_run = cols[4].text.strip()
+
+    # Columns index (HTML से confirm)
+    # 0 = Section (blank)
+    # 1 = Device
+    # 2 = Start Time
+    # 3 = Start Address
+    # 4 = End Time
+    # 5 = End Address
+    # 6 = KM Run
+
+    if len(cols) >= 7:
+        device = cols[1].text.strip()
+        end_time = cols[4].text.strip()
+        km_run = cols[6].text.strip()
         last_location = cols[5].text.strip()
 
-        if device_id and end_time:
+        if device and end_time:
             data.append([
-                device_id,
+                device,
                 end_time,
                 km_run,
                 last_location
             ])
 
 if not data:
-    raise RuntimeError("No table data found")
-
-
-df = pd.DataFrame(
-    data,
-    columns=["Device ID", "End Time", "KM Run", "Last Location"]
-)
-
-sheet.clear()
-sheet.update([df.columns.values.tolist()] + df.values.tolist())
-
-
-driver.quit()
+    raise RuntimeError("Table found but no usable data extracted")
