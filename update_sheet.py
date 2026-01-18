@@ -134,7 +134,6 @@ try:
 
 finally:
     driver.quit()
-time.sleep(10)
 
 # अगर page iframe में हो तो switch
 iframes = driver.find_elements(By.TAG_NAME, "iframe")
