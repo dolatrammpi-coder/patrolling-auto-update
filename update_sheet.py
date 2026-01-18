@@ -94,8 +94,8 @@ try:
     # ===============================
     REPORT_URL = (
         "https://ip3.rilapp.com/railways/patrollingReport.php"
-        "?fdate=17/01/2026&ftime=04:00"
-        "&tdate=18/01/2026&ttime=16:00"
+        "?fdate=17/01/2026&ftime=23:00"
+        "&tdate=18/01/2026&ttime=7:10"
         "&category=-PM&Submit=Update"
     )
 
