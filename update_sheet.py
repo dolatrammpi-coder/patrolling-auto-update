@@ -98,8 +98,16 @@ try:
     # ===============================
     # REPORT PAGE
     # ===============================
-    driver.get("https://ip3.rilapp.com/patrolling-report")
-    time.sleep(12)
+    driver.get(
+    "https://ip3.rilapp.com/railways/patrollingReport.php"
+    "?fdate=17%2F01%2F2026"
+    "&ftime=04%3A00"
+    "&tdate=18%2F01%2F2026"
+    "&ttime=16%3A00"
+    "&category=-PM"
+    "&Submit=Update"
+    )
+    time.sleep(15)
 
     # ===============================
     # TABLE READ
