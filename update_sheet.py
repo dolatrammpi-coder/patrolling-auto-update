@@ -114,30 +114,30 @@ try:
     data = []
 
     for r in rows:
-        cols = r.find_elements(By.TAG_NAME, "td")
-        if len(cols) >= 7:
-            device = cols[1].text.strip()
+    cols = r.find_elements(By.TAG_NAME, "td")
+    if len(cols) >= 7:
+        device = cols[1].text.strip()
 
-            # DEVICE NAME CLEANING
-    for prefix in ["RG-PM-CH-HGJ/", "RG P"]:
-        device = device.replace(prefix, "")
+        # DEVICE NAME CLEANING
+        for prefix in ["RG-PM-CH-HGJ/", "RG P"]:
+            device = device.replace(prefix, "")
 
-    device = device.split("#")[0].strip()
-            end_time = cols[4].text.strip()
-            km_run = cols[6].text.strip()
-            last_location = cols[5].text.strip()
+        device = device.split("#")[0].strip()
 
-            if device and end_time:
-                # Convert End Time to datetime for sorting
-                end_dt = datetime.strptime(end_time, "%d/%m/%Y %H:%M:%S")
+        end_time = cols[4].text.strip()
+        km_run = cols[6].text.strip()
+        last_location = cols[5].text.strip()
 
-                data.append([
-                    device,
-                    end_time,   # display
-                    end_dt,     # sorting key
-                    km_run,
-                    last_location
-                ])
+        if device and end_time:
+            end_dt = datetime.strptime(end_time, "%d/%m/%Y %H:%M:%S")
+
+            data.append([
+                device,
+                end_time,
+                end_dt,
+                km_run,
+                last_location
+            ])
 
     if not data:
         raise RuntimeError("No data extracted from table")
