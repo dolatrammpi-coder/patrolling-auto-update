@@ -46,4 +46,4 @@ creds = Credentials.from_service_account_info(
 )
 
 gc = gspread.authorize(creds)
-sheet = gc.open(SHEET_NAME).sheet
+sheet = gc.open(SHEET_NAME).sheet1
