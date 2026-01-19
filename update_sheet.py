@@ -169,19 +169,33 @@ try:
     )
 
     # ===============================
-    # FOOTER MESSAGE (BOLD)
-    # ===============================
-    footer_row = len(final_rows) + 3  # header + blank row
+# FOOTER MESSAGE (YELLOW + BOLD + MERGED)
+# ===============================
+footer_row = len(final_rows) + 3  # header + blank row
 
-    sheet.update(
-        f"A{footer_row}",
-        [["लाल रंग से हाइलाइट वाले पेट्रोलमैन अपने GPS रिस्टार्ट कर लें।"]]
-    )
+footer_text = "लाल रंग से हाइलाइट वाले पेट्रोलमैन अपने GPS रिस्टार्ट कर लें।"
 
-    sheet.format(
-        f"A{footer_row}",
-        {"textFormat": {"bold": True}}
-    )
+# Write text
+sheet.update(
+    f"A{footer_row}",
+    [[footer_text]]
+)
+
+# Merge A to D (पूरी table चौड़ाई)
+sheet.merge_cells(f"A{footer_row}:D{footer_row}")
+
+# Apply formatting
+sheet.format(
+    f"A{footer_row}:D{footer_row}",
+    {
+        "backgroundColor": {"red": 1, "green": 1, "blue": 0},  # Yellow
+        "horizontalAlignment": "CENTER",
+        "textFormat": {
+            "bold": True,
+            "fontSize": 14
+        }
+    }
+)
 
     print(f"SUCCESS: {len(final_rows)} rows updated")
 
