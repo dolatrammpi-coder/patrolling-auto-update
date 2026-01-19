@@ -118,10 +118,11 @@ try:
         if len(cols) >= 7:
             device = cols[1].text.strip()
 
-for prefix in ["RG-PM-CH-HGJ/", "RG P"]:
-    device = device.replace(prefix, "")
+            # DEVICE NAME CLEANING
+    for prefix in ["RG-PM-CH-HGJ/", "RG P"]:
+        device = device.replace(prefix, "")
 
-device = device.split("#")[0].strip()
+    device = device.split("#")[0].strip()
             end_time = cols[4].text.strip()
             km_run = cols[6].text.strip()
             last_location = cols[5].text.strip()
