@@ -135,7 +135,7 @@ try:
                 data.append([
                     device,
                     end_time_only,
-                    end_dt,
+                    end_dt,          # sort key
                     km_run,
                     last_location
                 ])
@@ -144,7 +144,7 @@ try:
         raise RuntimeError("No data extracted from table")
 
     # ===============================
-    # SORT BY TIME
+    # SORT BY TIME (ASCENDING)
     # ===============================
     data.sort(key=lambda x: x[2])
 
@@ -163,27 +163,18 @@ try:
     )
 
     # ===============================
-    # FOOTER MESSAGE (SAFE MERGE)
+    # FOOTER MESSAGE (YELLOW + BOLD, NO MERGE)
     # ===============================
     footer_row = len(final_rows) + 3
     footer_text = "लाल रंग से हाइलाइट वाले पेट्रोलमैन अपने GPS रिस्टार्ट कर लें।"
-    footer_range = f"A{footer_row}:D{footer_row}"
 
     sheet.update(
         values=[[footer_text]],
         range_name=f"A{footer_row}"
     )
 
-    # SAFE UNMERGE
-    try:
-        sheet.unmerge_cells(footer_range)
-    except Exception:
-        pass
-
-    sheet.merge_cells(footer_range)
-
     sheet.format(
-        footer_range,
+        f"A{footer_row}:D{footer_row}",
         {
             "backgroundColor": {"red": 1, "green": 1, "blue": 0},
             "horizontalAlignment": "CENTER",
