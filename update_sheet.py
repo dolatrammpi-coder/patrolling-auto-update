@@ -116,11 +116,11 @@ try:
         if len(cols) >= 7:
             device = cols[1].text.strip()
 
-            # DEVICE NAME CLEANING
-            for prefix in ["RG-PM-CH-HGJ/", "RG P"]:
-                device = device.replace(prefix, "")
-
-            device = device.split("#")[0].strip()
+            # DEVICE NAME CLEANING (FINAL)
+device = device.replace("RG-PM-CH-HGJ/", "")
+device = device.split("#")[0].strip()        # RG P 20
+device = device.replace("RG P", "").strip()  # 20
+device = f"P{device}"                        # P20
 
             end_time = cols[4].text.strip()
             km_run = cols[6].text.strip()
