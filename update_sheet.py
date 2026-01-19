@@ -169,20 +169,20 @@ try:
     )
 
     # ===============================
-# FOOTER MESSAGE (BOLD)
-# ===============================
-footer_row = len(final_rows) + 3  # header + blank line
+    # FOOTER MESSAGE (BOLD)
+    # ===============================
+    footer_row = len(final_rows) + 3  # header + blank row
 
-sheet.update(
-    f"A{footer_row}",
-    [["लाल रंग से हाइलाइट वाले पेट्रोलमैन अपने GPS रिस्टार्ट कर लें।"]]
-)
+    sheet.update(
+        f"A{footer_row}",
+        [["लाल रंग से हाइलाइट वाले पेट्रोलमैन अपने GPS रिस्टार्ट कर लें।"]]
+    )
 
-# Make footer bold
-sheet.format(
-    f"A{footer_row}",
-    {"textFormat": {"bold": True}}
-)
+    sheet.format(
+        f"A{footer_row}",
+        {"textFormat": {"bold": True}}
+    )
+
     print(f"SUCCESS: {len(final_rows)} rows updated")
 
 finally:
