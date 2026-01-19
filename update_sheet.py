@@ -116,27 +116,29 @@ try:
         if len(cols) >= 7:
             raw_device = cols[1].text.strip()
 
-            # ===============================
-            # DEVICE NAME CLEANING (FINAL)
-            # ===============================
+            # DEVICE CLEANING
             device = raw_device.replace("RG-PM-CH-HGJ/", "")
-            device = device.split("#")[0].strip()     # RG P 20
-            device = device.replace("RG P", "").strip()  # 20
-            device = f"P{device}"                     # P20
+            device = device.split("#")[0].strip()
+            device = device.replace("RG P", "").strip()
+            device = f"P{device}"
 
-            end_time = cols[4].text.strip()
+            end_time_full = cols[4].text.strip()  # 19/01/2026 06:30:25
             km_run = cols[6].text.strip()
             last_location = cols[5].text.strip()
 
-            if device and end_time:
+            if device and end_time_full:
+                # Convert to datetime
                 end_dt = datetime.strptime(
-                    end_time, "%d/%m/%Y %H:%M:%S"
+                    end_time_full, "%d/%m/%Y %H:%M:%S"
                 )
+
+                # ONLY TIME FOR DISPLAY
+                end_time_only = end_dt.strftime("%H:%M:%S")
 
                 data.append([
                     device,
-                    end_time,
-                    end_dt,
+                    end_time_only,  # 👈 Sheet में सिर्फ समय
+                    end_dt,         # 👈 sorting key
                     km_run,
                     last_location
                 ])
@@ -145,12 +147,12 @@ try:
         raise RuntimeError("No data extracted from table")
 
     # ===============================
-    # SORT BY END TIME (ASCENDING)
+    # SORT BY TIME (ASCENDING)
     # ===============================
     data.sort(key=lambda x: x[2])
 
     # ===============================
-    # PREPARE FINAL ROWS
+    # FINAL ROWS
     # ===============================
     final_rows = [
         [row[0], row[1], row[3], row[4]]
