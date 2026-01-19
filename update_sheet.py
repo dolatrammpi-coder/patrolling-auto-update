@@ -15,7 +15,7 @@ from selenium.webdriver.support import expected_conditions as EC
 
 
 # ===============================
-# ENV VARIABLES (REQUIRED)
+# ENV VARIABLES
 # ===============================
 LOGIN_USERNAME = os.getenv("LOGIN_USERNAME")
 LOGIN_PASSWORD = os.getenv("LOGIN_PASSWORD")
@@ -114,20 +114,24 @@ try:
     for r in rows:
         cols = r.find_elements(By.TAG_NAME, "td")
         if len(cols) >= 7:
-            device = cols[1].text.strip()
+            raw_device = cols[1].text.strip()
 
+            # ===============================
             # DEVICE NAME CLEANING (FINAL)
-device = device.replace("RG-PM-CH-HGJ/", "")
-device = device.split("#")[0].strip()        # RG P 20
-device = device.replace("RG P", "").strip()  # 20
-device = f"P{device}"                        # P20
+            # ===============================
+            device = raw_device.replace("RG-PM-CH-HGJ/", "")
+            device = device.split("#")[0].strip()     # RG P 20
+            device = device.replace("RG P", "").strip()  # 20
+            device = f"P{device}"                     # P20
 
             end_time = cols[4].text.strip()
             km_run = cols[6].text.strip()
             last_location = cols[5].text.strip()
 
             if device and end_time:
-                end_dt = datetime.strptime(end_time, "%d/%m/%Y %H:%M:%S")
+                end_dt = datetime.strptime(
+                    end_time, "%d/%m/%Y %H:%M:%S"
+                )
 
                 data.append([
                     device,
