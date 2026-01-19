@@ -47,3 +47,154 @@ creds = Credentials.from_service_account_info(
 
 gc = gspread.authorize(creds)
 sheet = gc.open(SHEET_NAME).sheet1
+
+
+# ===============================
+# SELENIUM SETUP
+# ===============================
+chrome_options = Options()
+chrome_options.add_argument("--headless=new")
+chrome_options.add_argument("--no-sandbox")
+chrome_options.add_argument("--disable-dev-shm-usage")
+
+service = Service()
+driver = webdriver.Chrome(service=service, options=chrome_options)
+wait = WebDriverWait(driver, 30)
+
+
+try:
+    # ===============================
+    # LOGIN
+    # ===============================
+    driver.get("https://ip3.rilapp.com/railways/")
+
+    username_box = wait.until(
+        EC.presence_of_element_located((By.NAME, "username"))
+    )
+    password_box = wait.until(
+        EC.presence_of_element_located((By.NAME, "password"))
+    )
+
+    username_box.clear()
+    password_box.clear()
+
+    username_box.send_keys(LOGIN_USERNAME)
+    password_box.send_keys(LOGIN_PASSWORD)
+
+    login_btn = wait.until(
+        EC.element_to_be_clickable((By.XPATH, "//button[@type='submit']"))
+    )
+    login_btn.click()
+
+    time.sleep(8)
+
+    # ===============================
+    # REPORT PAGE
+    # ===============================
+    REPORT_URL = (
+        "https://ip3.rilapp.com/railways/patrollingReport.php"
+        "?fdate=18/01/2026&ftime=23:00"
+        "&tdate=19/01/2026&ttime=07:10"
+        "&category=-PM&Submit=Update"
+    )
+
+    driver.get(REPORT_URL)
+
+    # ===============================
+    # READ TABLE
+    # ===============================
+    rows = wait.until(
+        EC.presence_of_all_elements_located(
+            (By.CSS_SELECTOR, "#example tbody tr")
+        )
+    )
+
+    data = []
+
+    for r in rows:
+        cols = r.find_elements(By.TAG_NAME, "td")
+        if len(cols) >= 7:
+            raw_device = cols[1].text.strip()
+
+            # ---------- DEVICE CLEANING ----------
+            device = raw_device.replace("RG-PM-CH-HGJ/", "")
+            device = device.split("#")[0].strip()
+            device = device.replace("RG P", "").strip()
+            device = f"P {device}"
+
+            end_time_full = cols[4].text.strip()
+            km_run = cols[6].text.strip()
+            last_location = cols[5].text.strip()
+
+            if device and end_time_full:
+                end_dt = datetime.strptime(
+                    end_time_full, "%d/%m/%Y %H:%M:%S"
+                )
+                end_time_only = end_dt.strftime("%H:%M:%S")
+
+                data.append([
+                    device,
+                    end_time_only,
+                    end_dt,
+                    km_run,
+                    last_location
+                ])
+
+    if not data:
+        raise RuntimeError("No data extracted from table")
+
+    # ===============================
+    # SORT BY TIME
+    # ===============================
+    data.sort(key=lambda x: x[2])
+
+    final_rows = [
+        [row[0], row[1], row[3], row[4]]
+        for row in data
+    ]
+
+    # ===============================
+    # GOOGLE SHEET UPDATE
+    # ===============================
+    sheet.clear()
+    sheet.update(
+        values=[["Device", "End Time", "KM Run", "Last Location"]] + final_rows,
+        range_name="A1"
+    )
+
+    # ===============================
+    # FOOTER MESSAGE (SAFE MERGE)
+    # ===============================
+    footer_row = len(final_rows) + 3
+    footer_text = "लाल रंग से हाइलाइट वाले पेट्रोलमैन अपने GPS रिस्टार्ट कर लें।"
+    footer_range = f"A{footer_row}:D{footer_row}"
+
+    sheet.update(
+        values=[[footer_text]],
+        range_name=f"A{footer_row}"
+    )
+
+    # SAFE UNMERGE
+    try:
+        sheet.unmerge_cells(footer_range)
+    except Exception:
+        pass
+
+    sheet.merge_cells(footer_range)
+
+    sheet.format(
+        footer_range,
+        {
+            "backgroundColor": {"red": 1, "green": 1, "blue": 0},
+            "horizontalAlignment": "CENTER",
+            "textFormat": {
+                "bold": True,
+                "fontSize": 14
+            }
+        }
+    )
+
+    print(f"SUCCESS: {len(final_rows)} rows updated")
+
+finally:
+    driver.quit()
