@@ -116,7 +116,12 @@ try:
     for r in rows:
         cols = r.find_elements(By.TAG_NAME, "td")
         if len(cols) >= 7:
-            device = cols[1].text.strip().replace("RG-PM-CH-HGJ/", "")
+            device = cols[1].text.strip()
+
+for prefix in ["RG-PM-CH-HGJ/", "RG P"]:
+    device = device.replace(prefix, "")
+
+device = device.split("#")[0].strip()
             end_time = cols[4].text.strip()
             km_run = cols[6].text.strip()
             last_location = cols[5].text.strip()
