@@ -88,7 +88,6 @@ try:
 
     time.sleep(8)
 
-
     # ===============================
     # REPORT PAGE
     # ===============================
@@ -100,7 +99,6 @@ try:
     )
 
     driver.get(REPORT_URL)
-
 
     # ===============================
     # READ TABLE
@@ -114,49 +112,46 @@ try:
     data = []
 
     for r in rows:
-    cols = r.find_elements(By.TAG_NAME, "td")
-    if len(cols) >= 7:
-        device = cols[1].text.strip()
+        cols = r.find_elements(By.TAG_NAME, "td")
+        if len(cols) >= 7:
+            device = cols[1].text.strip()
 
-        # DEVICE NAME CLEANING
-        for prefix in ["RG-PM-CH-HGJ/", "RG P"]:
-            device = device.replace(prefix, "")
+            # DEVICE NAME CLEANING
+            for prefix in ["RG-PM-CH-HGJ/", "RG P"]:
+                device = device.replace(prefix, "")
 
-        device = device.split("#")[0].strip()
+            device = device.split("#")[0].strip()
 
-        end_time = cols[4].text.strip()
-        km_run = cols[6].text.strip()
-        last_location = cols[5].text.strip()
+            end_time = cols[4].text.strip()
+            km_run = cols[6].text.strip()
+            last_location = cols[5].text.strip()
 
-        if device and end_time:
-            end_dt = datetime.strptime(end_time, "%d/%m/%Y %H:%M:%S")
+            if device and end_time:
+                end_dt = datetime.strptime(end_time, "%d/%m/%Y %H:%M:%S")
 
-            data.append([
-                device,
-                end_time,
-                end_dt,
-                km_run,
-                last_location
-            ])
+                data.append([
+                    device,
+                    end_time,
+                    end_dt,
+                    km_run,
+                    last_location
+                ])
 
     if not data:
         raise RuntimeError("No data extracted from table")
-
 
     # ===============================
     # SORT BY END TIME (ASCENDING)
     # ===============================
     data.sort(key=lambda x: x[2])
 
-
     # ===============================
-    # PREPARE FINAL ROWS (REMOVE SORT KEY)
+    # PREPARE FINAL ROWS
     # ===============================
     final_rows = [
         [row[0], row[1], row[3], row[4]]
         for row in data
     ]
-
 
     # ===============================
     # GOOGLE SHEET UPDATE
@@ -167,7 +162,7 @@ try:
         [["Device", "End Time", "KM Run", "Last Location"]] + final_rows
     )
 
-    print(f"SUCCESS: {len(final_rows)} rows updated in ascending End Time order")
+    print(f"SUCCESS: {len(final_rows)} rows updated")
 
 finally:
     driver.quit()
