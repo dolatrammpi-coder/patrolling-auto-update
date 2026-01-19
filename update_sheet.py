@@ -166,7 +166,7 @@ try:
     # FOOTER MESSAGE (YELLOW + BOLD, NO MERGE)
     # ===============================
     footer_row = len(final_rows) + 3
-    footer_text = "लाल रंग से हाइलाइट वाले पेट्रोलमैन अपने GPS रिस्टार्ट कर लें।"
+    footer_text = "लाल रंग से हाइलाइट वाले पेट्रोलमैन अपने GPS रिस्टार्ट (बंद करके दोबारा चालू) कर लें।"
 
     sheet.update(
         values=[[footer_text]],
@@ -180,7 +180,7 @@ try:
             "horizontalAlignment": "CENTER",
             "textFormat": {
                 "bold": True,
-                "fontSize": 14
+                "fontSize": 25
             }
         }
     )
