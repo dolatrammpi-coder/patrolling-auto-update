@@ -168,6 +168,21 @@ try:
         [["Device", "End Time", "KM Run", "Last Location"]] + final_rows
     )
 
+    # ===============================
+# FOOTER MESSAGE (BOLD)
+# ===============================
+footer_row = len(final_rows) + 3  # header + blank line
+
+sheet.update(
+    f"A{footer_row}",
+    [["लाल रंग से हाइलाइट वाले पेट्रोलमैन अपने GPS रिस्टार्ट कर लें।"]]
+)
+
+# Make footer bold
+sheet.format(
+    f"A{footer_row}",
+    {"textFormat": {"bold": True}}
+)
     print(f"SUCCESS: {len(final_rows)} rows updated")
 
 finally:
