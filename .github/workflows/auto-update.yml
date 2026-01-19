@@ -2,7 +2,7 @@ name: Auto Update Patrolling Sheet
 
 on:
   schedule:
-    - cron: "5 * 2 * *"
+    - cron: "*/5 * * * *"
   workflow_dispatch:
 
 jobs:
