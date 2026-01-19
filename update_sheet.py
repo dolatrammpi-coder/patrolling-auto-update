@@ -120,7 +120,7 @@ try:
             device = raw_device.replace("RG-PM-CH-HGJ/", "")
             device = device.split("#")[0].strip()
             device = device.replace("RG P", "").strip()
-            device = f"P{device}"
+            device = f"P {device}"
 
             end_time_full = cols[4].text.strip()  # 19/01/2026 06:30:25
             km_run = cols[6].text.strip()
